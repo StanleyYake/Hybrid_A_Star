@@ -46,14 +46,14 @@ double Mod2Pi(const double &x) {
 }
 
 HybridAStarFlow::HybridAStarFlow(ros::NodeHandle &nh) {
-    double steering_angle = nh.param("planner/steering_angle", 10);
-    int steering_angle_discrete_num = nh.param("planner/steering_angle_discrete_num", 1);
-    double wheel_base = nh.param("planner/wheel_base", 1.0);
+    double steering_angle = nh.param("planner/steering_angle", 30);
+    int steering_angle_discrete_num = nh.param("planner/steering_angle_discrete_num", 5);
+    double wheel_base = nh.param("planner/wheel_base", 0.65);
     double segment_length = nh.param("planner/segment_length", 1.6);
     int segment_length_discrete_num = nh.param("planner/segment_length_discrete_num", 8);
     double steering_penalty = nh.param("planner/steering_penalty", 1.05);
     double steering_change_penalty = nh.param("planner/steering_change_penalty", 1.5);
-    double reversing_penalty = nh.param("planner/reversing_penalty", 2.0);
+    double reversing_penalty = nh.param("planner/reversing_penalty", 5.0);
     double shot_distance = nh.param("planner/shot_distance", 5.0);
 
     kinodynamic_astar_searcher_ptr_ = std::make_shared<HybridAStar>(
@@ -82,26 +82,22 @@ void HybridAStarFlow::Run() {
         current_costmap_ptr_ = costmap_deque_.front();
         costmap_deque_.pop_front();
 
-        const double map_resolution = 0.2;
+        double map_resolution = current_costmap_ptr_->info.resolution;
         kinodynamic_astar_searcher_ptr_->Init(
                 current_costmap_ptr_->info.origin.position.x,
                 1.0 * current_costmap_ptr_->info.width * current_costmap_ptr_->info.resolution,
                 current_costmap_ptr_->info.origin.position.y,
                 1.0 * current_costmap_ptr_->info.height * current_costmap_ptr_->info.resolution,
-                current_costmap_ptr_->info.resolution,
+                1.0,
                 map_resolution
         );
 
-        unsigned int map_w = std::floor(current_costmap_ptr_->info.width / map_resolution);
-        unsigned int map_h = std::floor(current_costmap_ptr_->info.height / map_resolution);
+        unsigned int map_w = std::floor(current_costmap_ptr_->info.width);
+        unsigned int map_h = std::floor(current_costmap_ptr_->info.height);
         for (unsigned int w = 0; w < map_w; ++w) {
             for (unsigned int h = 0; h < map_h; ++h) {
-                auto x = static_cast<unsigned int> ((w + 0.5) * map_resolution
-                                                    / current_costmap_ptr_->info.resolution);
-                auto y = static_cast<unsigned int> ((h + 0.5) * map_resolution
-                                                    / current_costmap_ptr_->info.resolution);
-
-                if (current_costmap_ptr_->data[y * current_costmap_ptr_->info.width + x]) {
+                
+                if (current_costmap_ptr_->data[h * current_costmap_ptr_->info.width + w]) {
                     kinodynamic_astar_searcher_ptr_->SetObstacle(w, h);
                 }
             }
@@ -172,7 +168,7 @@ void HybridAStarFlow::Run() {
 
 
         // debug
-//        std::cout << "visited nodes: " << kinodynamic_astar_searcher_ptr_->GetVisitedNodesNumber() << std::endl;
+        std::cout << "visited nodes: " << kinodynamic_astar_searcher_ptr_->GetVisitedNodesNumber() << std::endl;
         kinodynamic_astar_searcher_ptr_->Reset();
     }
 }

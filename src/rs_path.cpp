@@ -130,9 +130,9 @@ RSPath::RSPathData RSPath::GetRSPath(const double x, const double y, const doubl
     RSPathData path;
     CSC(x, y, phi, path);
     CCC(x, y, phi, path);
-    CCCC(x, y, phi, path);
-    CCSC(x, y, phi, path);
-    CCSCC(x, y, phi, path);
+    // CCCC(x, y, phi, path);
+    // CCSC(x, y, phi, path);
+    // CCSCC(x, y, phi, path);
 
     return path;
 }
@@ -509,14 +509,14 @@ TypeVectorVecd<3> RSPath::GetRSPath(const Vec3d &start_state, const Vec3d &goal_
 
     length = rs_path.Length() * turning_radius_;
     // Debug info
-//    std::cout << "rs length: " << rs_path.Length() << "  | "
-//              << rs_path.length_[0] << " " << rs_path.length_[1] << " "
-//              << rs_path.length_[2] << " " << rs_path.length_[3] << " "
-//              << rs_path.length_[4] << std::endl;
-//    std::cout << "type: "
-//              << rs_path.type_[0] << " " << rs_path.type_[1] << " "
-//              << rs_path.type_[2] << " " << rs_path.type_[3] << " "
-//              << rs_path.type_[4] << std::endl;
+   std::cout << "rs length: " << rs_path.Length() << "  | "
+             << rs_path.length_[0] << " " << rs_path.length_[1] << " "
+             << rs_path.length_[2] << " " << rs_path.length_[3] << " "
+             << rs_path.length_[4] << std::endl;
+   std::cout << "type: "
+             << rs_path.type_[0] << " " << rs_path.type_[1] << " "
+             << rs_path.type_[2] << " " << rs_path.type_[3] << " "
+             << rs_path.type_[4] << std::endl;
 
     const double path_length = rs_path.Length() * turning_radius_;
     const auto interpolation_number = static_cast<unsigned int> (path_length / step_size);
